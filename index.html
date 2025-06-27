@@ -4,306 +4,313 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tools By Nayya</title>
-    
-    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts: Inter for a clean look -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
     <style>
-        /* Use Inter font as the default */
         body {
             font-family: 'Inter', sans-serif;
         }
-        /* Simple transition for smoother UI changes */
-        .form-container {
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        /* Style untuk toggle active state */
+        .tab-button.active {
+            background-color: #4f46e5;
+            color: white;
         }
-        .form-hidden {
-            opacity: 0;
-            transform: translateY(10px);
-            position: absolute;
-            pointer-events: none;
+        /* Menyembunyikan panah di input number */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
         }
-        .form-visible {
-            opacity: 1;
-            transform: translateY(0);
-            position: static;
+        input[type=number] {
+            -moz-appearance: textfield;
         }
     </style>
 </head>
-<body class="bg-slate-100 dark:bg-slate-900 flex items-center justify-center min-h-screen p-4">
+<body class="bg-slate-900 text-gray-200 antialiased">
 
     <!-- Login Screen -->
-    <div id="login-screen" class="w-full max-w-sm">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8">
-            <h1 class="text-2xl font-bold text-center text-slate-800 dark:text-white mb-2">Login</h1>
-            <p class="text-center text-slate-500 dark:text-slate-400 mb-6">Masukkan password untuk melanjutkan</p>
+    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-sm bg-slate-800 rounded-xl shadow-lg p-8 space-y-6">
+            <div class="text-center">
+                <h1 class="text-3xl font-bold text-white">Login</h1>
+                <p class="text-slate-400 mt-2">Masukkan password untuk melanjutkan</p>
+            </div>
             <form id="login-form">
                 <div class="space-y-4">
-                    <div>
-                        <label for="login-password" class="sr-only">Password</label>
-                        <input type="password" id="login-password" placeholder="Password" class="w-full p-3 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:text-white">
-                    </div>
-                    <button type="button" id="login-button" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition-colors">
-                        Masuk
-                    </button>
+                    <input type="password" id="login-password" placeholder="Password" class="w-full bg-slate-700 border border-slate-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition duration-200" required>
+                    <p id="login-error" class="text-red-400 text-sm hidden">Password salah.</p>
                 </div>
+                <button type="submit" class="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
+                    Masuk
+                </button>
             </form>
-            <!-- Login Notification Area -->
-            <div id="login-notification" class="hidden mt-4 p-3 rounded-lg text-center font-medium text-sm">
-                <p id="login-notification-message"></p>
-            </div>
         </div>
     </div>
 
-    <!-- Main Tool Screen (Initially Hidden) -->
-    <div id="main-tool-screen" class="hidden w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 transition-all">
-        
-        <!-- Header/Title -->
-        <h1 class="text-3xl font-bold text-center text-slate-800 dark:text-white mb-2">Tools By Nayya</h1>
-        <p class="text-center text-slate-500 dark:text-slate-400 mb-8">Pilih tools yang Anda butuhkan</p>
+    <!-- Main Content (Hidden by default) -->
+    <main id="main-content" class="min-h-screen p-4 md:p-8 hidden">
+        <div class="max-w-2xl mx-auto">
+            <header class="text-center mb-10">
+                <h1 class="text-4xl md:text-5xl font-bold text-white">Tools By Nayya</h1>
+                <p class="text-slate-400 mt-2">Pilih tools yang ingin Anda gunakan</p>
+            </header>
 
-        <!-- Toggle Buttons -->
-        <div class="grid grid-cols-2 gap-4 mb-8">
-            <button id="btn-premium" class="toggle-btn w-full font-semibold py-3 px-4 rounded-lg transition-all">
-                Premium Generator
-            </button>
-            <button id="btn-data" class="toggle-btn w-full font-semibold py-3 px-4 rounded-lg transition-all">
-                Kuota Operator
-            </button>
-        </div>
+            <!-- Toggle Buttons -->
+            <div class="flex bg-slate-800 p-1.5 rounded-xl mb-8 shadow-md">
+                <button id="tab-premium" class="tab-button w-1/2 p-3 rounded-lg font-semibold transition-all duration-300 active">Premium Generator</button>
+                <button id="tab-data" class="tab-button w-1/2 p-3 rounded-lg font-semibold transition-all duration-300">Data all operator</button>
+            </div>
 
-        <!-- Forms Container -->
-        <div class="relative">
-            <!-- Premium Generator Form -->
-            <div id="form-premium" class="form-container form-visible">
-                <form id="premium-generator-form" class="space-y-4">
-                    <!-- Rules Section -->
-                    <div class="p-4 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-500/50 rounded-r-lg">
-                        <h4 class="font-bold text-yellow-800 dark:text-yellow-200 mb-2">PERATURAN !!!</h4>
-                        <ul class="list-disc list-inside text-yellow-700 dark:text-yellow-300 space-y-1 text-sm">
+            <!-- Content Panels -->
+            <div id="content-container">
+                <!-- Premium Generator Panel -->
+                <div id="premium-panel" class="space-y-6">
+                    <div class="bg-yellow-900/20 border border-yellow-500/30 text-yellow-200 p-5 rounded-xl">
+                        <h3 class="font-bold text-lg mb-2">PERATURAN !!!</h3>
+                        <ul class="list-disc list-inside space-y-1 text-sm">
                             <li>Generate akun jika dibutuhkan atau ketika ada pembeli dan jangan di timbun.</li>
                             <li>1 IP 1 Secret Key.</li>
-                            <li class="font-semibold">Melanggar? Secret Key akan dihapus dari database dan semua akun yang pernah di-generate kembali backfree.</li>
+                            <li class="font-semibold">Melanggar? Secret Key akan di hapus dari database dan semua akun yang pernah di Generate kembali backfree.</li>
                         </ul>
                     </div>
-                    
-                    <div>
-                        <label for="premium-app" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Pilih aplikasi</label>
-                        <select id="premium-app" class="w-full p-3 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:text-white">
-                            <option>Alightmotion Premium 1 Tahun</option>
-                            <option>Wink Android 1 Bulan</option>
-                            <option>Wink Ios 1 Bulan</option>
-                            <option>Capcut pro 1 Bulan</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="domain" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Domain</label>
-                        <input type="email" id="domain" placeholder="example@nayya.xyz" class="w-full p-3 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:text-white">
-                    </div>
-                    <div>
-                        <label for="total" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Total</label>
-                        <input type="number" id="total" placeholder="max 10" class="w-full p-3 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:text-white">
-                    </div>
-                    <div>
-                        <label for="wa-number" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Nomor WA</label>
-                        <input type="tel" id="wa-number" placeholder="62***********" class="w-full p-3 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:text-white">
-                    </div>
-                    <div>
-                        <label for="secret-key-premium" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Secret Key</label>
-                        <input type="password" id="secret-key-premium" class="w-full p-3 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:text-white">
-                    </div>
-                    <button type="button" id="generate-premium" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition-colors !mt-6">
-                        Generate
-                    </button>
-                </form>
-            </div>
+                    <form id="premium-form" class="bg-slate-800 p-6 md:p-8 rounded-xl shadow-lg space-y-6">
+                        <div>
+                            <label for="premium-app" class="block mb-2 text-sm font-medium text-slate-300">Pilih aplikasi</label>
+                            <select id="premium-app" class="w-full bg-slate-700 border border-slate-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition duration-200">
+                                <option>Alightmotion Premium 1 Tahun</option>
+                                <option>Wink Android 1 Bulan</option>
+                                <option>Wink Ios 1 Bulan</option>
+                                <option>Capcut pro 1 Bulan</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="premium-domain" class="block mb-2 text-sm font-medium text-slate-300">Domain</label>
+                            <input type="email" id="premium-domain" placeholder="@example.xyz" class="w-full bg-slate-700 border border-slate-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition duration-200">
+                        </div>
+                         <div>
+                            <label for="premium-total" class="block mb-2 text-sm font-medium text-slate-300">Total</label>
+                            <input type="number" id="premium-total" placeholder="Jumlah" class="w-full bg-slate-700 border border-slate-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition duration-200">
+                        </div>
+                        <div>
+                            <label for="premium-wa" class="block mb-2 text-sm font-medium text-slate-300">Nomor WA</label>
+                            <input type="number" id="premium-wa" placeholder="62**********" class="w-full bg-slate-700 border border-slate-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition duration-200">
+                        </div>
+                        <div>
+                            <label for="premium-key" class="block mb-2 text-sm font-medium text-slate-300">Secret Key</label>
+                            <input type="password" id="premium-key" placeholder="••••••••" class="w-full bg-slate-700 border border-slate-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition duration-200">
+                        </div>
+                        <p id="premium-error" class="text-red-400 text-sm hidden text-center">Harap isi semua kolom dengan benar.</p>
+                        <button type="submit" id="premium-generate-btn" class="w-full flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 disabled:bg-indigo-400 disabled:cursor-not-allowed">
+                            <span class="btn-text">Generate</span>
+                            <svg class="animate-spin h-5 w-5 ml-3 hidden btn-loader" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
 
-            <!-- Kuota Operator Form -->
-            <div id="form-data" class="form-container form-hidden">
-                <form id="data-operator-form" class="space-y-4">
-                    <!-- Information Section -->
-                    <div class="p-4 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-400 dark:border-blue-500/50 rounded-r-lg">
-                        <h4 class="font-bold text-blue-800 dark:text-blue-200 mb-2">INFORMASI!!!</h4>
-                        <ul class="list-disc list-inside text-blue-700 dark:text-blue-300 space-y-1 text-sm">
-                            <li>Semua Paket 100% Kuota Utama Tanpa Aplikasi Tambahan.</li>
-                            <li>Masa Aktif 30 Hari.</li>
-                            <li>1 Order Key untuk 1x Pengisian.</li>
+                <!-- Data Operator Panel (Hidden by default) -->
+                <div id="data-panel" class="space-y-6 hidden">
+                     <div class="bg-sky-900/20 border border-sky-500/30 text-sky-200 p-5 rounded-xl">
+                        <h3 class="font-bold text-lg mb-2">INFORMASI !!!</h3>
+                        <ul class="list-disc list-inside space-y-1 text-sm">
+                            <li>Full Kuota Utama tanpa aplikasi tambahan.</li>
+                            <li>Masa aktif 30 hari.</li>
+                            <li>1 order key untuk 1x generate.</li>
                         </ul>
                     </div>
-                    <div>
-                        <label for="operator" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Pilih Operator</label>
-                        <select id="operator" class="w-full p-3 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:text-white">
-                            <option>Indosat 300GB</option>
-                            <option>Axis Unlimited</option>
-                            <option>XL Unlimited</option>
-                            <option>Telkomsel 150GB</option>
-                            <option>Tri 300GB</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="phone-number" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Nomor HP</label>
-                        <input type="tel" id="phone-number" placeholder="62***********" class="w-full p-3 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:text-white">
-                    </div>
-                    <div>
-                        <label for="order-key-data" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Order Key</label>
-                        <input type="password" id="order-key-data" class="w-full p-3 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:text-white">
-                    </div>
-                     <button type="button" id="generate-data" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition-colors !mt-6">
-                        Generate
-                    </button>
-                </form>
+                    <form id="data-form" class="bg-slate-800 p-6 md:p-8 rounded-xl shadow-lg space-y-6">
+                        <div>
+                            <label for="data-operator" class="block mb-2 text-sm font-medium text-slate-300">Pilih Operator</label>
+                            <select id="data-operator" class="w-full bg-slate-700 border border-slate-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition duration-200">
+                                <option>Indosat 300GB</option>
+                                <option>Axis Unlimited</option>
+                                <option>XL Unlimited</option>
+                                <option>Telkomsel 150GB</option>
+                                <option>Tri 300GB</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="data-hp" class="block mb-2 text-sm font-medium text-slate-300">Nomor HP</label>
+                            <input type="number" id="data-hp" placeholder="62***********" class="w-full bg-slate-700 border border-slate-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition duration-200">
+                        </div>
+                        <div>
+                            <label for="data-key" class="block mb-2 text-sm font-medium text-slate-300">Order Key</label>
+                            <input type="password" id="data-key" placeholder="••••••••" class="w-full bg-slate-700 border border-slate-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition duration-200">
+                        </div>
+                        <p id="data-error" class="text-red-400 text-sm hidden text-center">Harap isi semua kolom dengan benar.</p>
+                        <button type="submit" id="data-generate-btn" class="w-full flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 disabled:bg-indigo-400 disabled:cursor-not-allowed">
+                            <span class="btn-text">Generate</span>
+                             <svg class="animate-spin h-5 w-5 ml-3 hidden btn-loader" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
+    </main>
 
-        <!-- Notification Area -->
-        <div id="notification" class="hidden mt-6 p-4 rounded-lg text-center font-medium transition-all">
-            <p id="notification-message"></p>
+    <!-- Modal Notification -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-800 rounded-xl shadow-2xl p-8 max-w-sm w-full text-center space-y-4 transform transition-all scale-95 opacity-0" id="modal-content">
+            <div class="w-16 h-16 mx-auto bg-green-500/10 text-green-400 rounded-full flex items-center justify-center">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-white">Success</h2>
+            <p id="modal-message" class="text-slate-300">Data akan terkirim, tunggu beberapa menit.</p>
+            <button id="modal-close-btn" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg transition duration-200">
+                Tutup
+            </button>
         </div>
     </div>
 
+
     <script>
-        // --- CONSTANTS ---
-        const CORRECT_LOGIN_PASSWORD = "demouser";
-        const CORRECT_SECRET_KEY = "668899"; // This key is used for both forms
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
+            const loginScreen = document.getElementById('login-screen');
+            const mainContent = document.getElementById('main-content');
+            const loginForm = document.getElementById('login-form');
+            const loginPassword = document.getElementById('login-password');
+            const loginError = document.getElementById('login-error');
 
-        // --- LOGIN ELEMENTS ---
-        const loginScreen = document.getElementById('login-screen');
-        const mainToolScreen = document.getElementById('main-tool-screen');
-        const loginPasswordInput = document.getElementById('login-password');
-        const loginButton = document.getElementById('login-button');
-        const loginNotification = document.getElementById('login-notification');
-        const loginNotificationMessage = document.getElementById('login-notification-message');
-        
-        // --- TOOL ELEMENTS ---
-        const btnPremium = document.getElementById('btn-premium');
-        const btnData = document.getElementById('btn-data');
-        const formPremium = document.getElementById('form-premium');
-        const formData = document.getElementById('form-data');
-        const generatePremiumBtn = document.getElementById('generate-premium');
-        const generateDataBtn = document.getElementById('generate-data');
-        const notification = document.getElementById('notification');
-        const notificationMessage = document.getElementById('notification-message');
-
-        // --- TOOL INPUTS ---
-        const premiumInputs = {
-            app: document.getElementById('premium-app'),
-            domain: document.getElementById('domain'),
-            total: document.getElementById('total'),
-            waNumber: document.getElementById('wa-number'),
-            secretKey: document.getElementById('secret-key-premium')
-        };
-        const dataInputs = {
-            operator: document.getElementById('operator'),
-            phoneNumber: document.getElementById('phone-number'),
-            orderKey: document.getElementById('order-key-data')
-        };
-
-        // --- STYLE CLASSES ---
-        const activeClasses = ['bg-indigo-600', 'text-white', 'shadow-md'];
-        const inactiveClasses = ['bg-slate-200', 'dark:bg-slate-700', 'text-slate-600', 'dark:text-slate-300'];
-
-        // --- FUNCTIONS ---
-
-        // Function to show a notification on any screen (login or main)
-        function showGenericNotification(message, type = 'success', element, messageElement) {
-            messageElement.textContent = message;
-            element.classList.remove('hidden', 'bg-green-100', 'dark:bg-green-900', 'text-green-800', 'dark:text-green-200', 'bg-red-100', 'dark:bg-red-900', 'text-red-800', 'dark:text-red-200');
+            const tabPremium = document.getElementById('tab-premium');
+            const tabData = document.getElementById('tab-data');
+            const premiumPanel = document.getElementById('premium-panel');
+            const dataPanel = document.getElementById('data-panel');
             
-            if (type === 'success') {
-                element.classList.add('bg-green-100', 'dark:bg-green-900', 'text-green-800', 'dark:text-green-200');
-            } else { // error
-                element.classList.add('bg-red-100', 'dark:bg-red-900', 'text-red-800', 'dark:text-red-200');
-            }
+            const premiumForm = document.getElementById('premium-form');
+            const dataForm = document.getElementById('data-form');
 
-            setTimeout(() => {
-                element.classList.add('hidden');
-            }, 3000);
-        }
+            const modal = document.getElementById('modal');
+            const modalContent = document.getElementById('modal-content');
+            const modalMessage = document.getElementById('modal-message');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
 
-        // Function to switch between forms in the main tool
-        function showForm(formToShow, buttonToActivate) {
-            notification.classList.add('hidden'); // Hide notification on tab switch
-            formPremium.classList.add('form-hidden');
-            formPremium.classList.remove('form-visible');
-            formData.classList.add('form-hidden');
-            formData.classList.remove('form-visible');
+            const CORRECT_PASSWORD = 'demouser';
+            const CORRECT_KEY = '080808';
+
+            // --- Login Logic ---
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (loginPassword.value === CORRECT_PASSWORD) {
+                    loginScreen.classList.add('hidden');
+                    mainContent.classList.remove('hidden');
+                } else {
+                    loginError.classList.remove('hidden');
+                    loginPassword.classList.add('border-red-500');
+                }
+            });
             
-            formToShow.classList.remove('form-hidden');
-            formToShow.classList.add('form-visible');
+            loginPassword.addEventListener('input', () => {
+                loginError.classList.add('hidden');
+                loginPassword.classList.remove('border-red-500');
+            });
 
-            btnPremium.classList.remove(...activeClasses, ...inactiveClasses);
-            btnData.classList.remove(...activeClasses, ...inactiveClasses);
-
-            if (buttonToActivate === btnPremium) {
-                btnPremium.classList.add(...activeClasses);
-                btnData.classList.add(...inactiveClasses);
-            } else {
-                btnData.classList.add(...activeClasses);
-                btnPremium.classList.add(...inactiveClasses);
+            // --- Tab Switching Logic ---
+            function switchTab(activeTab, inactiveTab, activePanel, inactivePanel) {
+                activeTab.classList.add('active');
+                inactiveTab.classList.remove('active');
+                activePanel.classList.remove('hidden');
+                inactivePanel.classList.add('hidden');
             }
-        }
-        
-        // --- EVENT LISTENERS ---
 
-        // Login Handler
-        function handleLogin() {
-            if (loginPasswordInput.value === CORRECT_LOGIN_PASSWORD) {
-                loginScreen.classList.add('hidden');
-                mainToolScreen.classList.remove('hidden');
-                // Set initial state for the main tool after successful login
-                showForm(formPremium, btnPremium);
-            } else {
-                showGenericNotification('Password salah!', 'error', loginNotification, loginNotificationMessage);
-                loginPasswordInput.value = ""; // Clear wrong password
+            tabPremium.addEventListener('click', () => switchTab(tabPremium, tabData, premiumPanel, dataPanel));
+            tabData.addEventListener('click', () => switchTab(tabData, tabPremium, dataPanel, premiumPanel));
+
+            // --- Modal Logic ---
+            function showModal(message) {
+                modalMessage.textContent = message;
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modalContent.classList.remove('scale-95', 'opacity-0');
+                }, 10);
             }
-        }
-        
-        loginButton.addEventListener('click', handleLogin);
-        document.getElementById('login-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            handleLogin();
-        });
 
+            function hideModal() {
+                 modalContent.classList.add('scale-95', 'opacity-0');
+                 setTimeout(() => {
+                    modal.classList.add('hidden');
+                 }, 200);
+            }
 
-        // Tool Event Listeners
-        btnPremium.addEventListener('click', () => showForm(formPremium, btnPremium));
-        btnData.addEventListener('click', () => showForm(formData, btnData));
-
-        generatePremiumBtn.addEventListener('click', () => {
-            for (const key in premiumInputs) {
-                if (premiumInputs[key].value.trim() === '') {
-                    showGenericNotification('Error! Harap isi semua kolom.', 'error', notification, notificationMessage);
-                    return;
+            modalCloseBtn.addEventListener('click', hideModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    hideModal();
                 }
-            }
-            if (premiumInputs.secretKey.value !== CORRECT_SECRET_KEY) {
-                showGenericNotification('Error! Secret Key salah.', 'error', notification, notificationMessage);
-                return;
-            }
-            showGenericNotification('Success! Data akan terkirim, tunggu beberapa menit.', 'success', notification, notificationMessage);
-            document.getElementById('premium-generator-form').reset();
-        });
+            });
+            
+            // --- Form Submission Logic ---
+            function handleFormSubmit(form, inputs, keyInput, errorElement, button, successMessage) {
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    errorElement.classList.add('hidden');
 
-        generateDataBtn.addEventListener('click', () => {
-            for (const key in dataInputs) {
-                if (dataInputs[key].value.trim() === '') {
-                    showGenericNotification('Error! Harap isi semua kolom.', 'error', notification, notificationMessage);
-                    return;
-                }
-            }
-            if (dataInputs.orderKey.value !== CORRECT_SECRET_KEY) {
-                showGenericNotification('Error! Order Key salah.', 'error', notification, notificationMessage);
-                return;
-            }
-            showGenericNotification('Success! Kuota akan terkirim, tunggu beberapa menit.', 'success', notification, notificationMessage);
-            document.getElementById('data-operator-form').reset();
-        });
+                    let allFilled = true;
+                    inputs.forEach(input => {
+                        if (!document.getElementById(input).value) {
+                            allFilled = false;
+                        }
+                    });
+                    
+                    const isKeyCorrect = document.getElementById(keyInput).value === CORRECT_KEY;
 
+                    if (!allFilled || !isKeyCorrect) {
+                        errorElement.textContent = !isKeyCorrect && allFilled ? "Secret Key / Order Key salah." : "Harap isi semua kolom.";
+                        errorElement.classList.remove('hidden');
+                        return;
+                    }
+
+                    // --- Start loading animation ---
+                    const btnText = button.querySelector('.btn-text');
+                    const btnLoader = button.querySelector('.btn-loader');
+                    button.disabled = true;
+                    btnText.classList.add('hidden');
+                    btnLoader.classList.remove('hidden');
+
+                    // Simulate API call / generation process
+                    setTimeout(() => {
+                        // Stop loading animation
+                        button.disabled = false;
+                        btnText.classList.remove('hidden');
+                        btnLoader.classList.add('hidden');
+                        
+                        // Show success modal
+                        showModal(successMessage);
+                        form.reset(); // Reset form fields
+                    }, Math.random() * 5000 + 5000); // Random delay between 5-10 seconds
+                });
+            }
+
+            // --- Initialize Premium Form ---
+            handleFormSubmit(
+                premiumForm,
+                ['premium-app', 'premium-domain', 'premium-total', 'premium-wa', 'premium-key'],
+                'premium-key',
+                document.getElementById('premium-error'),
+                document.getElementById('premium-generate-btn'),
+                'Data akan terkirim, tunggu beberapa menit.'
+            );
+
+            // --- Initialize Data Form ---
+            handleFormSubmit(
+                dataForm,
+                ['data-operator', 'data-hp', 'data-key'],
+                'data-key',
+                document.getElementById('data-error'),
+                document.getElementById('data-generate-btn'),
+                'Kuota akan terkirim, tunggu beberapa menit.'
+            );
+        });
     </script>
 </body>
 </html>
+
